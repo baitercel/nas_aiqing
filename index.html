@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+    <title>爱情宣言</title>
+    <link rel="stylesheet" href="lib/bootstrap-4.0.0-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://www.bootcss.com/p/buttons/css/buttons.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .logo {
+            width: 60%;
+            /*height: 500px;*/
+            margin: auto;
+            padding-top:50px;
+        }
+
+        .name {
+            text-align: center;
+            font-size: 35px;
+            /*text-shadow: 3px 5px grey, 1px 1px #333;*/
+            color:#c00;
+        }
+
+        .img {
+            width: 48%;
+            height: 53%;
+            margin: auto;
+            margin-top: 38px;
+        }
+
+        .img img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .search {
+            width: 60%;
+            height: 100px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .noExtension {
+            width: 60%;
+            height: 100px;
+            margin: auto;
+            font-size: 15px;
+        }
+
+        #search_value {
+            width: 50%;
+            height: 50px;
+            box-shadow: 3px 5px grey, 1px 1px #333;
+        }
+
+        .search button {
+            width: 18%;
+            height: 50px;
+            margin-left: 6px;
+            box-shadow: 3px 5px grey, 1px 1px #333;
+        }
+
+         @keyframes rotate {
+            0% { transform:rotateY(0deg);}
+            25% { transform:rotateY(180deg);}
+            50% { transform:rotateY(0deg);}
+            75% { transform:rotateY(180deg);}
+            100% { transform:rotateY(0deg);}
+        }
+
+        .logo_rotate {
+			/*
+            animation: rotate 10s infinite;
+            animation-fill-mode: forwards;
+            animation-timing-function: linear;
+				*/
+            /*  当动画结束时，让<div>元素保留上一个关键帧的样式值 */
+        }
+
+         .result_success {
+            width: 60%;
+            margin: auto;
+        }
+
+        .result_faile{
+            width: 60%;
+            margin: auto;
+        }
+
+        .add_banner{
+            width: 60%;
+            margin: auto;
+        }
+
+        .add_banner input{
+            width: 80%;
+            height: 50px;
+            box-shadow: 3px 5px grey, 1px 1px #333;
+        }
+
+        .add_banner button{
+            width: 18%;
+            height: 50px;
+            margin-left: 6px;
+            box-shadow: 3px 5px grey, 1px 1px #333;
+        }
+
+        #search_banner{
+            font-size: 40px;
+            border-bottom: 1px solid black;
+        }
+
+        p{
+            text-indent:2em;
+            font-size: 20px;
+        }
+
+        .hide{
+            display: none;
+        }
+
+        .contenner{
+            /*background: url("img/bg.jpg ");*/
+            /*height: 900px;*/
+            position:relative;
+            z-index: 10000;
+        }
+
+        .author{
+            text-align: right;
+        }
+        .author p{
+            display: inline-block;
+            font-size: 14px;
+        }
+        .footer{
+            position: fixed;
+            bottom: 0;
+            text-align: center;
+            width:100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contenner">
+        <div class="logo">
+            <div class="name">爱情宣言</div>
+
+        </div>
+        <div class="noExtension hide" id="noExtension">
+            注意: 请安装 <a target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet" style="color: red;">星云钱包拓展</a>
+        </div>
+        <div class="search">
+            <input id="search_value" type="text" placeholder="请输入姓名">
+            <button id=search>寻找</button>
+        </div>
+
+        <div class="result_success hide">
+            <div id=search_banner></div>
+            <p id=search_result> wait for content </p>
+            <div class="author">
+                <i><p> 作者:</p> <p id=search_result_author> dasdajkajksdhjasdkjahdkjad</p></i>
+            </div>
+        </div>
+
+        <div class="result_faile hide">
+            没有找到 &nbsp;&nbsp;<i id="result_faile_add" style="color:red">asd</i>&nbsp;&nbsp; 爱情宣言. <button class="button button-pill button-primary" id="add">添加</button>
+        </div>
+
+        <div class="add_banner hide">
+            <input type="text" id="add_value" placeholder="请输入爱情宣言">
+            <button id="push">提交</button>
+            </div>
+
+
+
+    </div>
+    <script src=lib/jquery-3.3.1.min.js></script>
+    <script src=lib/nebPay.js></script>
+    <script src=lib/bootstrap-4.0.0-dist/js/bootstrap.min.js></script>
+    <script>
+        var NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
+        var nebPay = new NebPay();
+
+        $("#search_value").attr("disabled",true)
+        $("#search").attr("disabled",true)
+
+
+        //to check if the extension is installed
+        //if the extension is installed, var "webExtensionWallet" will be injected in to web page
+        if(typeof(webExtensionWallet) === "undefined"){
+            //alert ("Extension wallet is not installed, please install it first.")
+            $("#noExtension").removeClass("hide")
+        }else{
+            $("#search_value").attr("disabled",false)
+            $("#search").attr("disabled",false)
+        }
+
+        var dappAddress = "n1z1mTdgQBNjJZcw2iJVSYMnPKPMCWMoh9N";
+
+        // 搜索功能: 查找Super-Dictionary 中有没有该词条
+    $("#search").click(function(){
+        // $("#search_value").val() 搜索框内的值
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "get";
+        var callArgs = "[\"" + $("#search_value").val() + "\"]"; //in the form of ["args"]
+        nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: cbSearch      //指定回调函数
+        });
+    })
+
+    //return of search,
+    function cbSearch(resp) {
+        var result = resp.result
+        console.log("return of rpc call: " + JSON.stringify(result))
+
+        if (result === 'null'){
+            $(".add_banner").addClass("hide");
+            $(".result_success").addClass("hide");
+
+            $("#result_faile_add").text($("#search_value").val())
+
+            $(".result_faile").removeClass("hide");
+        } else{
+            //if result is not null, then it should be "return value" or "error message"
+            try{
+                result = JSON.parse(result)
+            }catch (err){
+                //result is the error message
+            }
+
+            if (!!result.key){      //"return value"
+                $(".add_banner").addClass("hide");
+                $(".result_faile").addClass("hide");
+
+                $("#search_banner").text($("#search_value").val())
+                $("#search_result").text(result.value)
+                $("#search_result_author").text(result.author)
+
+                $(".result_success").removeClass("hide");
+            } else {        //"error message"
+                $(".add_banner").addClass("hide");
+                $(".result_faile").addClass("hide");
+
+                $("#search_banner").text($("#search_value").val())
+                $("#search_result").text(result)
+                $("#search_result_author").text("")
+
+                $(".result_success").removeClass("hide");
+            }
+
+        }
+
+    }
+
+    // 添加信息功能: 像super-dictionary 中添加词条
+    $("#add").click(function() {
+        $(".result_faile").addClass("hide");
+        $(".add_banner").removeClass("hide");
+
+        $("#add_value").val("")
+    })
+
+    $("#push").click(function() {
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "save"
+        var callArgs = "[\"" + $("#search_value").val() + "\",\"" + $("#add_value").val() + "\"]"
+
+        nebPay.call(to, value, callFunction, callArgs, {    //使用nebpay的call接口去调用合约,
+            listener: cbPush
+        });
+    });
+
+    function cbPush(resp) {
+        console.log("response of push: " + resp)
+    }
+
+
+</script>
+    <canvas id="c" style="margin-top: -180px;z-index:90;"></canvas>
+
+
+    <script src="js/index.js"></script>
+
+<div class="footer">
+    <p style=" text-align:center;font-size:12px;color:#aaa">爱情宣言基于星云链主网运行，永久保存您的爱情宣言。</p>
+    <p><img style="height:1.5rem;" src="data:image/svg+xml;base64,PHN2ZyBpZD0i5Zu+5bGCXzEiIGRhdGEtbmFtZT0i5Zu+5bGCIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDIxNCAzMCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+LmNscy0xe2ZpbGwtcnVsZTpldmVub2RkO308L3N0eWxlPgogIDwvZGVmcz4KICA8dGl0bGU+bmViPC90aXRsZT4KICA8cGF0aCBjbGFzcz0iY2xzLTEiCiAgICAgICAgZD0iTTEwOC45MiwyLjVsLTIuNDEsNy4zMmgwbC05LjIsNC42OCw3LjEsMi40OCw0LjU1LDkuNSwyLjQxLTcuMzJoMGw5LjItNC42OEwxMTMuNDYsMTJabS00LjU0LDEzLjYzLTUtMS43Ni4xMS0uMDYsNi42OS0zLjQtMS43Miw1LjIzWm00LjY4LTExLjUxLDMuNiw3LjUzLTcuMywzLjcxWm0tLjI1LDE5Ljc1LTMuMzUtNyw1LjA3LDEuNzZabTkuNTktOS42OUwxMTEsMTguNDVsLTUuMy0xLjg1LjExLS4wNiw3LjM5LTMuNzYsNS4zLDEuODVaIi8+CiAgPHBhdGggY2xhc3M9ImNscy0xIgogICAgICAgIGQ9Ik0xNTUuNDEsMTQuNTZhMiwyLDAsMCwwLC40My0xLjIzVjEyLjE0YTIuMSwyLjEsMCwwLDAtMS40NS0ybDAsMGE0LjkxLDQuOTEsMCwwLDAtMS41NS0uMjVoLTQuOTF2OS43M2g1LjY0YTQuODIsNC44MiwwLDAsMCwxLjU0LS4yNWwuMDYsMGEyLjEsMi4xLDAsMCwwLDEuNDUtMnYtLjg3QTIuMzQsMi4zNCwwLDAsMCwxNTUuNDEsMTQuNTZabS02LjY4LTMuODRoNC4wN2E0LjA3LDQuMDcsMCwwLDEsMS4yOS4yMWwwLDBhMS4yNywxLjI3LDAsMCwxLC44NywxLjJ2MS4xOWExLjEyLDEuMTIsMCwwLDEtLjYxLDFoLTUuNjZabTUuNzIsNC4zOGExLjUxLDEuNTEsMCwwLDEsMS4yOSwxLjQxdi44NGExLjI2LDEuMjYsMCwwLDEtLjg3LDEuMmwtLjA1LDBhNCw0LDAsMCwxLTEuMjkuMjFoLTQuOFYxNS4wOVoiLz4KICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiCiAgICAgICAgICAgcG9pbnRzPSIxMzYuMDcgMTkuNiAxMzYuMDcgMTAuMDUgMTQzLjg4IDEwLjA1IDE0My44OCAxMC44NSAxMzYuODUgMTAuODUgMTM2Ljg1IDE0LjQzIDE0My4xMSAxNC40MyAxNDMuMTEgMTUuMjIgMTM2Ljg1IDE1LjIyIDEzNi44NSAxOC44IDE0NC42NCAxOC44IDE0NC42NCAxOS42IDEzNi4wNyAxOS42Ii8+CiAgPHBvbHlnb24gY2xhc3M9ImNscy0xIgogICAgICAgICAgIHBvaW50cz0iMTI0LjkxIDExLjQ5IDEyNC45MSAxOS40MiAxMjQuMTMgMTkuNDIgMTI0LjEzIDkuNDggMTMxLjk3IDE3Ljk5IDEzMS45NyAxMC4wNyAxMzIuNzYgMTAuMDcgMTMyLjc2IDIwIDEyNC45MSAxMS40OSIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIKICAgICAgICBkPSJNMTYzLjY3LDE5LjYyYTQsNCwwLDAsMS0zLjk1LTMuODNWOS44N2guODN2NS45MWEzLjEyLDMuMTIsMCwwLDAsMy4xMiwzaC41OWEzLjEyLDMuMTIsMCwwLDAsMy4xMi0zVjkuODdoLjgzdjUuOTFhNCw0LDAsMCwxLTMuOTQsMy44NFoiLz4KICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiCiAgICAgICAgICAgcG9pbnRzPSIxNzEuODIgMTkuNDIgMTcxLjgyIDEwLjA3IDE3Mi42MSAxMC4wNyAxNzIuNjEgMTguNjQgMTc5LjY5IDE4LjY0IDE3OS42OSAxOS40MiAxNzEuODIgMTkuNDIiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiCiAgICAgICAgZD0iTTE5MC4yOCwxOS41M2wtMS4xOC0yLjM1aC01LjU3bC0xLjE4LDIuMzVoLS45bDQuODctOS42Nyw0Ljg2LDkuNjdabS0xLjU4LTMuMTUtMi4zOC00Ljc0LTIuMzgsNC43NFoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiCiAgICAgICAgZD0iTTE5My42NCwxOS40MXYtLjgyaDUuNDZhMy44OSwzLjg5LDAsMCwwLDEuMjItLjIsMS40MywxLjQzLDAsMCwwLC44NC0xLjI2VjE2LjZhMS40MiwxLjQyLDAsMCwwLS44Mi0xLjI0LDQsNCwwLDAsMC0xLjI1LS4yaC0zYTQuNzMsNC43MywwLDAsMS0xLjUyLS4yNUEyLDIsMCwwLDEsMTkzLjI0LDEzVjEyLjJhMiwyLDAsMCwxLDEuMzgtMS44OCw0LjY4LDQuNjgsMCwwLDEsMS41MS0uMjVoNC44MnYuODJoLTQuODJhMy45LDMuOSwwLDAsMC0xLjI1LjIxLDEuMTUsMS4xNSwwLDAsMC0uODEsMS4xVjEzYTEuMTUsMS4xNSwwLDAsMCwuODEsMS4xLDQsNCwwLDAsMCwxLjI2LjIxaDNhNC43Miw0LjcyLDAsMCwxLDEuNDguMjRsLjA5LDBhMi4yNCwyLjI0LDAsMCwxLDEuMzIsMnYuNTVhMi4yNSwyLjI1LDAsMCwxLTEuMzEsMmwtLjA4LDBhNC43NCw0Ljc0LDAsMCwxLTEuNDkuMjRaIi8+CiAgPHBhdGgKICAgIGQ9Ik0xNC44MSwxMy4yMmEyLjYxLDIuNjEsMCwwLDAsLjU1LTEuNzEsMi43OCwyLjc4LDAsMCwwLS4yNS0xLjE4LDIuNDEsMi40MSwwLDAsMC0uNjktLjg4LDIuNjcsMi42NywwLDAsMC0xLS41LDExLjYyLDExLjYyLDAsMCwwLTIuMzMtLjE0SDkuMTh2MTAuM0gxMFYxNC4yNGguOGExMy43MiwxMy43MiwwLDAsMCwyLjYxLS4xOEEyLjM5LDIuMzksMCwwLDAsMTQuODEsMTMuMjJabS0uODgtLjM2YTIuNjMsMi42MywwLDAsMS0yLC41NUgxMFY5LjY2aDEuODhjMS43LDAsMi41Ni42MiwyLjU2LDEuODVBMS45MiwxLjkyLDAsMCwxLDEzLjkzLDEyLjg2WiIvPgogIDxwYXRoCiAgICBkPSJNMjMuNTgsMTIuNTJhMy43LDMuNywwLDAsMC01LjQyLDBBNCw0LDAsMCwwLDE3LDE1LjM3YTQsNCwwLDAsMCwxLjExLDIuODIsMy43NCwzLjc0LDAsMCwwLDUuNDUsMCw0LjE5LDQuMTksMCwwLDAsMC01LjY4Wk0yMywxNy42NWEyLjg1LDIuODUsMCwwLDEtMi4xNS45NCwyLjc5LDIuNzksMCwwLDEtMi4xMy0uOTMsMy4yMywzLjIzLDAsMCwxLS44Ni0yLjI2LDMuMywzLjMsMCwwLDEsLjg5LTIuMywyLjgxLDIuODEsMCwwLDEsNC4yNCwwLDMuMjYsMy4yNiwwLDAsMSwuODksMi4yOEEzLjIxLDMuMjEsMCwwLDEsMjMsMTcuNjVaIi8+CiAgPHBvbHlnb24KICAgIHBvaW50cz0iMzYuMjMgMTEuNTQgMzMuODQgMTcuNTUgMzEuMzggMTEuNTQgMzEuMzIgMTEuNTQgMjguODUgMTcuNTUgMjYuNSAxMS41NCAyNS42OCAxMS41NCAyOC44MiAxOS4zNyAyOC44OSAxOS4zNyAzMS4zNSAxMy40MyAzMy44IDE5LjM3IDMzLjg3IDE5LjM3IDM3LjA3IDExLjU0IDM2LjIzIDExLjU0Ii8+CiAgPHBhdGgKICAgIGQ9Ik00NC42OCwxNi44YTMuMTIsMy4xMiwwLDAsMS0yLjg5LDEuODIsMi43MiwyLjcyLDAsMCwxLTItLjg4LDMuMzgsMy4zOCwwLDAsMS0uODgtMi4zMXYtLjA5aDYuNzZhNC4yLDQuMiwwLDAsMC0xLjEzLTIuOTEsMy42NCwzLjY0LDAsMCwwLTIuNjktMS4xLDMuNTEsMy41MSwwLDAsMC0yLjY4LDEuMTgsNC4yNiw0LjI2LDAsMCwwLDAsNS42OCwzLjU3LDMuNTcsMCwwLDAsMi43NCwxLjE4LDMuNzgsMy43OCwwLDAsMCwzLjQ4LTIuMjFaTTM5LDE0LjU1YTIuODMsMi44MywwLDAsMSwyLjg1LTIuNDIsMywzLDAsMCwxLDEuODcuNjQsMi44MywyLjgzLDAsMCwxLDEsMS43OWwwLC4xaC01LjhaIi8+CiAgPHBhdGgKICAgIGQ9Ik01OC4xMywxNi44YTMuMTIsMy4xMiwwLDAsMS0yLjg5LDEuODIsMi43MiwyLjcyLDAsMCwxLTItLjg4LDMuMzgsMy4zOCwwLDAsMS0uODgtMi4zMXYtLjA5aDYuNzZBNC4yLDQuMiwwLDAsMCw1OCwxMi40M2EzLjY0LDMuNjQsMCwwLDAtMi42OS0xLjEsMy41MSwzLjUxLDAsMCwwLTIuNjgsMS4xOCw0LjI2LDQuMjYsMCwwLDAsMCw1LjY4LDMuNTcsMy41NywwLDAsMCwyLjc0LDEuMTgsMy43OCwzLjc4LDAsMCwwLDMuNDgtMi4yMVptLTUuNy0yLjI1YTIuODMsMi44MywwLDAsMSwyLjg1LTIuNDIsMywzLDAsMCwxLDEuODcuNjQsMi44MywyLjgzLDAsMCwxLDEsMS43OWwwLC4xSDUyLjRaIi8+CiAgPHBhdGgKICAgIGQ9Ik02MS44MywxOC4xOGEzLjYxLDMuNjEsMCwwLDAsMi43MywxLjE4LDMuNjgsMy42OCwwLDAsMCwyLjg4LTEuNTZsLjE1LS4xOHYxLjQ4aC43OFY4LjU1aC0uNzh2NC41OGwtLjE1LS4yMWEzLjQ0LDMuNDQsMCwwLDAtMi45Mi0xLjU4LDMuNTksMy41OSwwLDAsMC0yLjY4LDEuMTgsNCw0LDAsMCwwLTEuMTIsMi44M0E0LDQsMCwwLDAsNjEuODMsMTguMThabS41OC01LjFhMywzLDAsMCwxLDQuMzcsMCwzLjI5LDMuMjksMCwwLDEsLjg3LDIuMywzLjE2LDMuMTYsMCwwLDEtLjkzLDIuMzMsMywzLDAsMCwxLTIuMTYuOTIsMi44MiwyLjgyLDAsMCwxLTIuMTMtMSwzLjM3LDMuMzcsMCwwLDEsMC00LjU2WiIvPgogIDxwYXRoCiAgICBkPSJNODAuODksMTIuNTFhMy41NCwzLjU0LDAsMCwwLTIuNjgtMS4xOCwzLjY3LDMuNjcsMCwwLDAtMi45NSwxLjVsLS4xNS4xOFY4LjU1aC0uNzhWMTkuMTFoLjc4VjE3LjVsLjE1LjIxYTMuNSwzLjUsMCwwLDAsMi45MiwxLjY2LDMuNTgsMy41OCwwLDAsMCwyLjY4LTEuMTgsNC4xOCw0LjE4LDAsMCwwLDAtNS42OFptLS42LDUuMWEyLjkyLDIuOTIsMCwwLDEtNC4zNCwwLDMuMzUsMy4zNSwwLDAsMS0uODktMi4zNUEzLjE5LDMuMTksMCwwLDEsNzUuOTQsMTNhMi45MiwyLjkyLDAsMCwxLDIuMTktLjkxLDIuODIsMi44MiwwLDAsMSwyLjE4LDEsMy4zMywzLjMzLDAsMCwxLC44NywyLjI4QTMuMjgsMy4yOCwwLDAsMSw4MC4yOSwxNy42WiIvPgogIDxwb2x5Z29uCiAgICBwb2ludHM9Ijg5LjE5IDExLjU0IDg2LjYzIDE3LjYzIDgzLjk5IDExLjU0IDgzLjE1IDExLjU0IDg2LjIgMTguNjEgODQuNzkgMjEuOTMgODUuNjMgMjEuOTMgOTAuMDQgMTEuNTQgODkuMTkgMTEuNTQiLz4KICA8cmVjdCB4PSI0Ny4zOCIgeT0iMTEuNDkiIHdpZHRoPSIwLjgzIiBoZWlnaHQ9IjcuNzIiLz4KICA8cGF0aAogICAgZD0iTTQ3LjM5LDE0LjA2aC44NGExLjg5LDEuODksMCwwLDEsMS44NS0xLjcyLDEuOCwxLjgsMCwwLDEsLjYyLjEydi0uOWEyLjYzLDIuNjMsMCwwLDAtLjYyLS4wOEEyLjc0LDIuNzQsMCwwLDAsNDcuMzksMTQuMDZaIi8+Cjwvc3ZnPgo=" alt=""></p>
+</div>
+
+
+</body>
+
+</html>
